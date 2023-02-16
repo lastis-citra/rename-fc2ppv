@@ -4,10 +4,30 @@ from bs4 import BeautifulSoup
 import cloudscraper
 
 
+# https://fc2cm.com/ から情報を取り出す
+def get_fc2cm_data(fc2_id):
+    url = f'https://fc2cm.com/?p={fc2_id}'
+    # print(f'fc2cm_url: {url} ', end='')
+    scraper = cloudscraper.create_scraper(
+        browser={
+            'browser': 'chrome',
+            'platform': 'windows',
+            'desktop': True
+        }
+    )
+    res = scraper.get(url)
+    # res.encoding = res.apparent_encoding
+    soup = BeautifulSoup(res.content, 'html.parser')
+    a_tags = soup.select('a[rel="category"]')
+    if len(a_tags) == 1:
+        return a_tags[0].text
+    return ''
+
+
 # http://javip.net/ から情報を取り出す
 def get_javip_data(fc2_id):
     url = f'http://javip.net/fc2-ppv-{fc2_id}/'
-    # print(f'fc2_url: {url} ', end='')
+    # print(f'javip_url: {url} ', end='')
     scraper = cloudscraper.create_scraper(
         browser={
             'browser': 'chrome',
@@ -21,7 +41,7 @@ def get_javip_data(fc2_id):
     descriptions = soup.select_one('div.entry')
     for description in descriptions.text.splitlines():
         if '販売者' in description:
-            print(description)
+            # print(description)
             return description.replace('販売者 ', '')
     return ''
 
@@ -70,6 +90,10 @@ def rename_dir(path):
                 if seller == '':
                     print('Searching in javip...')
                     seller = get_javip_data(fc2_id)
+                # javipで見つからない場合はfc2cmで探す
+                if seller == '':
+                    print('Searching in fc2cm...')
+                    seller = get_fc2cm_data(fc2_id)
                 if seller == '':
                     user = UNDEFINED_NAME
                 else:
