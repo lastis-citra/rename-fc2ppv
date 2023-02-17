@@ -126,11 +126,10 @@ def rename_dir(path):
                 base_name = os.path.splitext(new_file_name)[0]
                 if len(base_name) > MAX_LENGTH:
                     base_name = [base_name[x:x + MAX_LENGTH] for x in range(0, len(base_name), MAX_LENGTH)][0]
-
+                # 禁則処理
+                base_name = re.sub(r'[\\/:*?"<>|]+', '', base_name)
                 # 同名ファイルがある場合は連番にする
                 new_file_name = duplicate_rename(os.path.join(path, base_name + ext))
-                # 禁則処理
-                new_file_name = re.sub(r'[\\/:*?"<>|]+', '', new_file_name)
                 print(f'Rename to: {new_file_name}')
                 os.rename(os.path.join(path, file_name), os.path.join(path, new_file_name))
         else:
