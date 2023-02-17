@@ -72,6 +72,20 @@ def get_fc2_data(fc2_id):
     return ''
 
 
+def duplicate_rename(file_path):
+    if os.path.exists(file_path):
+        name, ext = os.path.splitext(file_path)
+        i = 1
+        while True:
+            # 数値を3桁などにしたい場合は({:0=3})とする
+            new_name = "{} ({}){}".format(name, i, ext)
+            if not os.path.exists(new_name):
+                return new_name
+            i += 1
+    else:
+        return file_path
+
+
 def rename_dir(path):
     file_name_list = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     # print(file_name_list)
@@ -105,6 +119,14 @@ def rename_dir(path):
                     new_file_name = file_name.replace(f'{fc2_id}', f'{fc2_id} {user}')
                 # 禁則処理
                 new_file_name = re.sub(r'[\\/:*?"<>|]+', '', new_file_name)
+                # 拡張子とそれ以外に分割
+                ext = os.path.splitext(new_file_name)[1]
+                base_name = os.path.splitext(new_file_name)[0]
+                if len(base_name) > MAX_LENGTH:
+                    base_name = [base_name[x:x + MAX_LENGTH] for x in range(0, len(base_name), MAX_LENGTH)][0]
+
+                # 同名ファイルがある場合は連番にする
+                new_file_name = duplicate_rename(os.path.join(path, base_name + ext))
                 print(f'Rename to: {new_file_name}')
                 os.rename(os.path.join(path, file_name), os.path.join(path, new_file_name))
         else:
@@ -114,5 +136,6 @@ def rename_dir(path):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     UNDEFINED_NAME = '(By undefined name!!!)'
-    rename_dir(os.environ['RENAME_PATH'])
+    MAX_LENGTH = int(os.getenv('MAX_LENGTH', '10000'))
+    rename_dir(os.getenv('RENAME_PATH'))
 
