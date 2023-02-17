@@ -87,13 +87,17 @@ def duplicate_rename(file_path):
 
 
 def rename_dir(path):
-    file_name_list = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    # print(file_name_list)
+    print(f'Loading... ')
+    file_names = os.listdir(path)
+    print(f'Sorting... ')
+    file_names = sorted(file_names)
 
-    for file_name in file_name_list:
-        print(file_name)
+    count = len(file_names)
+    i = 0
+    for file_name in file_names:
+        print(f'Renaming... {i}/{count} {file_name}')
         # すでに変換済みのファイルは除く，undefinedが付いているファイルはもう1回検索する
-        if '(By ' not in file_name or UNDEFINED_NAME in file_name:
+        if ('(By ' not in file_name or UNDEFINED_NAME in file_name) and os.path.isfile(os.path.join(path, file_name)):
             # FC2PPVのIDを抜き出す
             fc2_ids = re.findall(r'FC2PPV\s(\d+)\s', file_name)
             if len(fc2_ids) == 1:
@@ -117,8 +121,6 @@ def rename_dir(path):
                     new_file_name = file_name.replace(f'{UNDEFINED_NAME}', f'{user}')
                 else:
                     new_file_name = file_name.replace(f'{fc2_id}', f'{fc2_id} {user}')
-                # 禁則処理
-                new_file_name = re.sub(r'[\\/:*?"<>|]+', '', new_file_name)
                 # 拡張子とそれ以外に分割
                 ext = os.path.splitext(new_file_name)[1]
                 base_name = os.path.splitext(new_file_name)[0]
@@ -127,10 +129,13 @@ def rename_dir(path):
 
                 # 同名ファイルがある場合は連番にする
                 new_file_name = duplicate_rename(os.path.join(path, base_name + ext))
+                # 禁則処理
+                new_file_name = re.sub(r'[\\/:*?"<>|]+', '', new_file_name)
                 print(f'Rename to: {new_file_name}')
                 os.rename(os.path.join(path, file_name), os.path.join(path, new_file_name))
         else:
             print('Already renamed!!!')
+        i += 1
 
 
 # Press the green button in the gutter to run the script.
@@ -138,4 +143,3 @@ if __name__ == '__main__':
     UNDEFINED_NAME = '(By undefined name!!!)'
     MAX_LENGTH = int(os.getenv('MAX_LENGTH', '10000'))
     rename_dir(os.getenv('RENAME_PATH'))
-
