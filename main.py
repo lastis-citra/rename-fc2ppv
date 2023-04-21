@@ -22,7 +22,8 @@ def get_jav380_data(fc2_id):
     if len(a_tags) > 0:
         content_url = a_tags[-1]["href"]
         res = scraper.get(content_url)
-        soup = BeautifulSoup(res.content, 'html.parser')
+        soup = BeautifulSoup(res.content, 'html.parse'
+                                          'r')
         contents = soup.select_one('div[class="post-content"]')
         for content in contents.text.splitlines():
             if '販売者' in content:
@@ -69,7 +70,7 @@ def get_javip_data(fc2_id):
     for description in descriptions.text.splitlines():
         if '販売者' in description:
             # print(description)
-            return description.replace('販売者 ', '')
+            return description.replace('販売者 ', '').replace('販売者', '')
     return ''
 
 
