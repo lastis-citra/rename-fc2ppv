@@ -120,9 +120,22 @@ def rename_dir(path):
     print(f'Sorting... ')
     file_names = sorted(file_names)
 
+    new_file_names = []
+    for file_name in file_names:
+        if 'FC2PPV-' in file_name:
+            new_file_name = file_name.replace('FC2PPV-', 'FC2PPV ')
+            new_file_path = os.path.join(path, new_file_name)
+            try:
+                os.rename(os.path.join(path, file_name), os.path.join(new_file_path))
+            except OSError:
+                print(f'OSError')
+            new_file_names.append(new_file_name)
+        else:
+            new_file_names.append(file_name)
+
     count = len(file_names)
     i = 1
-    for file_name in file_names:
+    for file_name in new_file_names:
         print(f'Renaming... {i}/{count} {file_name}')
         # すでに変換済みのファイルは除く，undefinedが付いているファイルはもう1回検索する
         if ('(By ' not in file_name or UNDEFINED_NAME in file_name) and os.path.isfile(os.path.join(path, file_name)):
@@ -133,9 +146,9 @@ def rename_dir(path):
                 print('Searching in FC2...')
                 seller = get_fc2_data(fc2_id)
                 # FC2で見つからない場合はjavipで探す
-                if seller == '':
-                    print('Searching in javip...')
-                    seller = get_javip_data(fc2_id)
+                # if seller == '':
+                #     print('Searching in javip...')
+                #     seller = get_javip_data(fc2_id)
                 # javipで見つからない場合はfc2cmで探す
                 if seller == '':
                     print('Searching in fc2cm...')
