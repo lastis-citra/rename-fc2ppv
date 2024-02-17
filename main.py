@@ -122,7 +122,15 @@ def rename_dir(path):
 
     new_file_names = []
     for file_name in file_names:
-        if 'FC2PPV-' in file_name:
+        if 'FC2 PPV' in file_name:
+            new_file_name = file_name.replace('FC2 PPV', 'FC2PPV')
+            new_file_path = os.path.join(path, new_file_name)
+            try:
+                os.rename(os.path.join(path, file_name), os.path.join(new_file_path))
+            except OSError:
+                print(f'OSError')
+            new_file_names.append(new_file_name)
+        elif 'FC2PPV-' in file_name:
             new_file_name = file_name.replace('FC2PPV-', 'FC2PPV ')
             new_file_path = os.path.join(path, new_file_name)
             try:
