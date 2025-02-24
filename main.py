@@ -92,7 +92,10 @@ def get_fc2_data(fc2_id):
     # 特に古いIDだと製品ページにたどり着けないため
     if 'Unable' in description:
         return ''
-    keywords = soup.select_one('meta[name="keywords"]')['content']
+    try:
+        keywords = soup.select_one('meta[name="keywords"]')['content']
+    except TypeError as e:
+        return ''
     keywords = keywords.split(',Videos')[0]
 
     if keywords != '':
