@@ -114,13 +114,12 @@ def get_fc2_data(fc2_id):
     if 'Unable' in description:
         return ''
     try:
-        keywords = soup.select_one('meta[name="keywords"]')['content']
+        account = soup.select_one('img[data-image="accountIcon"]')['title']
     except TypeError as e:
         return ''
-    keywords = keywords.split(',Videos')[0]
 
-    if keywords != '':
-        return keywords.split(",")[0]
+    if account != '':
+        return account
     return ''
 
 
