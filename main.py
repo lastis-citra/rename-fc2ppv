@@ -4,6 +4,28 @@ from bs4 import BeautifulSoup
 import cloudscraper
 
 
+# https://javbit.net/ から情報を取り出す
+def get_javbit_data(fc2_id):
+    url = f'https://javbit.net/fc2-ppv-{fc2_id}'
+    # print(f'javip_url: {url} ', end='')
+    scraper = cloudscraper.create_scraper(
+        browser={
+            'browser': 'chrome',
+            'platform': 'windows',
+            'desktop': True
+        }
+    )
+    res = scraper.get(url)
+    # res.encoding = res.apparent_encoding
+    soup = BeautifulSoup(res.content, 'html.parser')
+    contents = soup.select_one('div[class="postContent"]')
+    for content in contents.text.splitlines():
+        if '販売者' in content:
+            # print(content)
+            return content.replace('販売者 ', '')
+    return ''
+
+
 # https://javip.net/ から情報を取り出す
 def get_javip_data(fc2_id):
     url = f'https://javip.net/fc2-ppv-{fc2_id}'
@@ -205,6 +227,10 @@ def rename_dir(path):
                 if seller == '':
                     print('Searching in javip...')
                     seller = get_javip_data(fc2_id)
+                # fc2cmで見つからない場合はjavbitで探す
+                if seller == '':
+                    print('Searching in javbit...')
+                    seller = get_javbit_data(fc2_id)
                 if seller == '':
                     user = UNDEFINED_NAME
                 else:
