@@ -19,10 +19,13 @@ def get_javbit_data(fc2_id):
     # res.encoding = res.apparent_encoding
     soup = BeautifulSoup(res.content, 'html.parser')
     contents = soup.select_one('div[class="postContent"]')
-    for content in contents.text.splitlines():
-        if '販売者' in content:
-            # print(content)
-            return content.replace('販売者 ', '')
+    try:
+        for content in contents.text.splitlines():
+            if '販売者' in content:
+                # print(content)
+                return content.replace('販売者 ', '')
+    except AttributeError as e:
+        return ''
     return ''
 
 
@@ -110,10 +113,13 @@ def get_javip_data(fc2_id):
     # res.encoding = res.apparent_encoding
     soup = BeautifulSoup(res.content, 'html.parser')
     descriptions = soup.select_one('div.entry')
-    for description in descriptions.text.splitlines():
-        if '販売者' in description:
-            # print(description)
-            return description.replace('販売者 ', '').replace('販売者', '')
+    try:
+        for description in descriptions.text.splitlines():
+            if '販売者' in description:
+                # print(description)
+                return description.replace('販売者 ', '').replace('販売者', '')
+    except AttributeError as e:
+        return ''
     return ''
 
 
